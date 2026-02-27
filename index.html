@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thinking, Fast and Slow — Daniel Kahneman</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
+  
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f5f7;
+    --bg3: #e8e8ed;
+    --text: #1d1d1f;
+    --text2: #6e6e73;
+    --text3: #86868b;
+    --accent: #0071e3;
+    --accent-hover: #0077ed;
+    --highlight: #ffec3d;
+    --highlight-bg: rgba(255, 236, 61, 0.35);
+    --sidebar-w: 300px;
+    --header-h: 52px;
+    --serif: 'New York', 'Georgia', serif;
+    --sans: -apple-system, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  [data-theme="dark"] {
+    --bg: #000000;
+    --bg2: #1c1c1e;
+    --bg3: #2c2c2e;
+    --text: #f5f5f7;
+    --text2: #aeaeb2;
+    --text3: #636366;
+    --accent: #2997ff;
+    --accent-hover: #409cff;
+    --highlight-bg: rgba(255, 214, 10, 0.3);
+  }
+
+  html { font-size: 16px; scroll-behavior: smooth; }
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.3s, color 0.3s;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  #header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--header-h);
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 1000;
+    transition: background 0.3s, border-color 0.3s;
+  }
+
+  [data-theme="dark"] #header {
+    background: rgba(0,0,0,0.82);
+    border-color: rgba(255,255,255,0.08);
+  }
+
+  #header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  #menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 6px;
+    border-radius: 8px;
+    transition: background 0.15s;
+  }
+  #menu-btn:hover { background: var(--bg3); }
+  #menu-btn span {
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    background: var(--text);
+    transition: all 0.3s;
+    border-radius: 2px;
+  }
+  #menu-btn.open span:nth-child(1) { transform: rotate(45deg) translate(4.7px, 4.7px); }
+  #menu-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  #menu-btn.open span:nth-child(3) { transform: rotate(-45deg) translate(4.7px, -4.7px); }
+
+  #book-title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  #header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text);
+    transition: background 0.15s;
+  }
+  .icon-btn:hover { background: var(--bg3); }
+
+  #search-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg2);
+    border-radius: 10px;
+    padding: 6px 12px;
+    width: 200px;
+    transition: width 0.3s, background 0.15s;
+  }
+  #search-bar:focus-within { width: 280px; background: var(--bg3); }
+  #search-input {
+    border: none;
+    background: none;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    width: 100%;
+    font-family: var(--sans);
+  }
+  #search-input::placeholder { color: var(--text3); }
+
+  /* LAYOUT */
+  #layout {
+    display: flex;
+    min-height: 100vh;
+    padding-top: var(--header-h);
+  }
+
+  /* SIDEBAR */
+  #sidebar {
+    width: var(--sidebar-w);
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    bottom: 0;
+    background: var(--bg2);
+    border-right: 1px solid rgba(0,0,0,0.06);
+    overflow-y: auto;
+    transform: translateX(0);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
+    z-index: 900;
+    padding-bottom: 40px;
+  }
+
+  [data-theme="dark"] #sidebar {
+    border-color: rgba(255,255,255,0.06);
+  }
+
+  #sidebar.collapsed {
+    transform: translateX(calc(-1 * var(--sidebar-w)));
+  }
+
+  #sidebar-header {
+    padding: 20px 20px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  .part-label {
+    padding: 16px 20px 4px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-top: 8px;
+  }
+
+  .nav-item {
+    display: block;
+    padding: 9px 20px;
+    font-size: 14px;
+    color: var(--text2);
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 8px;
+    margin: 1px 8px;
+    transition: all 0.15s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: none;
+    background: none;
+    text-align: left;
+    width: calc(100% - 16px);
+    font-family: var(--sans);
+  }
+
+  .nav-item:hover { background: var(--bg3); color: var(--text); }
+  .nav-item.active {
+    background: var(--accent);
+    color: white !important;
+  }
+
+  /* MAIN CONTENT */
+  #main {
+    flex: 1;
+    margin-left: var(--sidebar-w);
+    transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #main.expanded {
+    margin-left: 0;
+  }
+
+  #chapter-view {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 40px 120px;
+    flex: 1;
+  }
+
+  .chapter-meta {
+    font-size: 13px;
+    color: var(--text3);
+    margin-bottom: 12px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .chapter-title {
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 40px;
+    color: var(--text);
+    font-family: var(--sans);
+  }
+
+  .chapter-divider {
+    width: 48px;
+    height: 2px;
+    background: var(--accent);
+    margin-bottom: 36px;
+    border-radius: 2px;
+  }
+
+  .chapter-body {
+    font-size: 18px;
+    line-height: 1.75;
+    color: var(--text);
+    font-family: var(--serif);
+    letter-spacing: -0.003em;
+  }
+
+  .chapter-body p {
+    margin-bottom: 24px;
+  }
+
+  .chapter-body p:first-child::first-letter {
+    float: left;
+    font-size: 4.2em;
+    line-height: 0.8;
+    padding-right: 8px;
+    padding-top: 4px;
+    font-family: var(--sans);
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* HIGHLIGHT */
+  mark {
+    background: var(--highlight-bg);
+    color: inherit;
+    padding: 1px 0;
+    border-radius: 2px;
+  }
+
+  #highlight-toolbar {
+    position: fixed;
+    background: var(--text);
+    color: var(--bg);
+    border-radius: 10px;
+    padding: 6px 4px;
+    display: none;
+    align-items: center;
+    gap: 2px;
+    z-index: 2000;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+    transform: translateX(-50%) translateY(-110%);
+    transition: opacity 0.15s;
+  }
+
+  #highlight-toolbar.visible {
+    display: flex;
+  }
+
+  .ht-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background 0.1s;
+    white-space: nowrap;
+    font-family: var(--sans);
+  }
+  .ht-btn:hover { background: rgba(255,255,255,0.15); }
+
+  .ht-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.2); margin: 0 2px; }
+
+  /* HIGHLIGHTS PANEL */
+  #highlights-panel {
+    position: fixed;
+    top: var(--header-h);
+    right: 0;
+    width: 320px;
+    bottom: 0;
+    background: var(--bg2);
+    border-left: 1px solid rgba(0,0,0,0.06);
+    transform: translateX(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 800;
+    overflow-y: auto;
+    padding-bottom: 40px;
+  }
+
+  [data-theme="dark"] #highlights-panel { border-color: rgba(255,255,255,0.06); }
+  #highlights-panel.open { transform: translateX(0); }
+
+  #hp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--bg3);
+  }
+
+  #hp-title { font-size: 15px; font-weight: 600; }
+
+  #hp-count {
+    font-size: 12px;
+    color: var(--text3);
+    background: var(--bg3);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  .highlight-card {
+    margin: 12px 16px;
+    padding: 14px 16px;
+    background: var(--bg);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: 1px solid transparent;
+  }
+  .highlight-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+  .hc-chapter { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+  .hc-text {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--text);
+    font-family: var(--serif);
+    border-left: 3px solid var(--highlight);
+    padding-left: 10px;
+  }
+  .hc-note {
+    font-size: 12px;
+    color: var(--text3);
+    margin-top: 8px;
+    font-style: italic;
+  }
+  .hc-delete {
+    float: right;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 0 0 8px;
+    transition: color 0.15s;
+  }
+  .hc-delete:hover { color: #ff3b30; }
+
+  /* WELCOME SCREEN */
+  #welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - var(--header-h));
+    text-align: center;
+    padding: 40px;
+  }
+
+  #welcome-book {
+    width: 140px;
+    height: 200px;
+    background: linear-gradient(135deg, #1d1d1f 0%, #3d3d3f 100%);
+    border-radius: 4px 12px 12px 4px;
+    margin-bottom: 40px;
+    box-shadow: -6px 6px 20px rgba(0,0,0,0.25), inset -4px 0 8px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+
+  #welcome-book::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 12px;
+    background: rgba(0,0,0,0.4);
+    border-radius: 4px 0 0 4px;
+  }
+
+  #welcome h1 {
+    font-size: clamp(32px, 5vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+    line-height: 1.08;
+  }
+
+  #welcome p {
+    font-size: 17px;
+    color: var(--text2);
+    max-width: 420px;
+    line-height: 1.5;
+    margin-bottom: 32px;
+  }
+
+  #start-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 980px;
+    padding: 14px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: all 0.15s;
+    letter-spacing: -0.01em;
+  }
+  #start-btn:hover { background: var(--accent-hover); transform: scale(1.02); }
+  #start-btn:active { transform: scale(0.98); }
+
+  /* PROGRESS BAR */
+  #reading-progress {
+    position: fixed;
+    top: var(--header-h);
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: transparent;
+    z-index: 999;
+  }
+  #reading-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.1s;
+  }
+
+  /* SCROLLBAR */
+  #sidebar::-webkit-scrollbar, #highlights-panel::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-track, #highlights-panel::-webkit-scrollbar-track { background: transparent; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 2px; }
+
+  /* SEARCH RESULTS */
+  .search-highlight { background: rgba(255, 180, 0, 0.4); border-radius: 2px; }
+
+  /* EMPTY HIGHLIGHTS */
+  #hp-empty {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text3);
+  }
+  #hp-empty svg { margin-bottom: 16px; opacity: 0.4; }
+  #hp-empty p { font-size: 14px; line-height: 1.5; }
+
+  /* FONT SIZE CONTROL */
+  #font-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Note modal */
+  #note-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 3000;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  #note-modal.open { display: flex; }
+  #note-box {
+    background: var(--bg);
+    border-radius: 18px;
+    padding: 28px;
+    width: 400px;
+    max-width: calc(100vw - 40px);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+  }
+  #note-box h3 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+  #note-textarea {
+    width: 100%;
+    border: 1px solid var(--bg3);
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 14px;
+    font-family: var(--sans);
+    background: var(--bg2);
+    color: var(--text);
+    resize: none;
+    outline: none;
+    min-height: 100px;
+  }
+  #note-textarea:focus { border-color: var(--accent); }
+  #note-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+  .note-btn {
+    padding: 8px 18px;
+    border-radius: 980px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: var(--sans);
+    transition: all 0.15s;
+  }
+  .note-btn-cancel { background: var(--bg2); color: var(--text); }
+  .note-btn-save { background: var(--accent); color: white; }
+  .note-btn:hover { opacity: 0.85; }
+
+  @media (max-width: 768px) {
+    :root { --sidebar-w: 280px; }
+    #sidebar { transform: translateX(calc(-1 * var(--sidebar-w))); }
+    #sidebar.open { transform: translateX(0); }
+    #main { margin-left: 0; }
+    #chapter-view { padding: 40px 24px 80px; }
+    #search-bar { width: 150px; }
+    #search-bar:focus-within { width: 180px; }
+    #highlights-panel { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<header id="header">
+  <div id="header-left">
+    <button id="menu-btn" aria-label="Toggle sidebar">
+      <span></span><span></span><span></span>
+    </button>
+    <span id="book-title">Thinking, Fast and Slow</span>
+  </div>
+  <div id="header-right">
+    <div id="search-bar">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text3);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input id="search-input" type="text" placeholder="Search…" autocomplete="off">
+    </div>
+    <button class="icon-btn" id="highlights-btn" aria-label="Highlights" title="Your highlights">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    </button>
+    <button class="icon-btn" id="font-dec" title="Smaller text" style="font-size:13px;font-weight:600;">A</button>
+    <button class="icon-btn" id="font-inc" title="Larger text" style="font-size:17px;font-weight:600;">A</button>
+    <button class="icon-btn" id="theme-btn" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg id="theme-icon-light" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      <svg id="theme-icon-dark" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- READING PROGRESS -->
+<div id="reading-progress"><div id="reading-progress-fill"></div></div>
+
+<!-- LAYOUT -->
+<div id="layout">
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div id="sidebar-header">Contents</div>
+    <div id="nav-list"></div>
+  </nav>
+
+  <!-- MAIN -->
+  <main id="main">
+    <!-- WELCOME -->
+    <div id="welcome">
+      <div id="welcome-book">Thinking,<br>Fast and Slow<br><br>Daniel<br>Kahneman</div>
+      <h1>Thinking,<br>Fast and Slow</h1>
+      <p>By Daniel Kahneman — Nobel Prize winner. A landmark work on human decision-making, bias, and the two systems that drive how we think.</p>
+      <button id="start-btn">Start Reading</button>
+    </div>
+
+    <!-- CHAPTER VIEW (hidden initially) -->
+    <div id="chapter-view" style="display:none"></div>
+  </main>
+</div>
+
+<!-- HIGHLIGHT TOOLBAR -->
+<div id="highlight-toolbar">
+  <button class="ht-btn" id="ht-highlight">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    Highlight
+  </button>
+  <div class="ht-divider"></div>
+  <button class="ht-btn" id="ht-note">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    Note
+  </button>
+  <div class="ht-divider"></div>
+  <button class="ht-btn" id="ht-copy">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+    Copy
+  </button>
+</div>
+
+<!-- HIGHLIGHTS PANEL -->
+<div id="highlights-panel">
+  <div id="hp-header">
+    <span id="hp-title">Highlights</span>
+    <span id="hp-count">0</span>
+  </div>
+  <div id="hp-list">
+    <div id="hp-empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <p>Select any text while reading to highlight it. Your highlights appear here.</p>
+    </div>
+  </div>
+</div>
+
+<!-- NOTE MODAL -->
+<div id="note-modal">
+  <div id="note-box">
+    <h3>Add a note</h3>
+    <textarea id="note-textarea" placeholder="Write your thoughts about this passage…"></textarea>
+    <div id="note-actions">
+      <button class="note-btn note-btn-cancel" id="note-cancel">Cancel</button>
+      <button class="note-btn note-btn-save" id="note-save">Save Note</button>
+    </div>
+  </div>
+</div>
+
+<script src="book_data.js"></script>
+<script>
+// STATE
+let currentChapterId = null;
+let highlights = JSON.parse(localStorage.getItem('tfas_highlights') || '[]');
+let fontSize = parseInt(localStorage.getItem('tfas_fontsize') || '18');
+let pendingHighlight = null;
+let sidebarOpen = true;
+let highlightsPanelOpen = false;
+let isDark = localStorage.getItem('tfas_dark') === 'true';
+
+// INIT THEME
+if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
+
+// BUILD NAV
+const navList = document.getElementById('nav-list');
+let currentPart = null;
+
+BOOK_DATA.forEach(ch => {
+  if (ch.is_part) {
+    const div = document.createElement('div');
+    div.className = 'part-label';
+    div.textContent = ch.title;
+    navList.appendChild(div);
+    currentPart = ch.title;
+  } else {
+    const btn = document.createElement('button');
+    btn.className = 'nav-item';
+    btn.textContent = ch.title;
+    btn.dataset.id = ch.id;
+    btn.addEventListener('click', () => loadChapter(ch.id));
+    navList.appendChild(btn);
+  }
+});
+
+// LOAD CHAPTER
+function loadChapter(id) {
+  const ch = BOOK_DATA.find(c => c.id === id);
+  if (!ch) return;
+
+  currentChapterId = id;
+  document.getElementById('welcome').style.display = 'none';
+  const view = document.getElementById('chapter-view');
+  view.style.display = 'block';
+
+  // Update active nav
+  document.querySelectorAll('.nav-item').forEach(b => {
+    b.classList.toggle('active', b.dataset.id === id);
+  });
+
+  // Format text into paragraphs
+  const rawText = ch.text || '';
+  const paragraphs = rawText
+    .replace(/\r\n/g, '\n')
+    .split(/\n{2,}/)
+    .filter(p => p.trim().length > 30)
+    .map(p => p.replace(/\n/g, ' ').trim())
+    .slice(0, 80);
+
+  let bodyHtml = paragraphs.map(p => `<p>${escapeHtml(p)}</p>`).join('');
+
+  view.innerHTML = `
+    <div class="chapter-meta">${ch.part || 'Thinking, Fast and Slow'}</div>
+    <h1 class="chapter-title">${escapeHtml(ch.title)}</h1>
+    <div class="chapter-divider"></div>
+    <div class="chapter-body" id="chapter-body">${bodyHtml}</div>
+  `;
+
+  // Apply font size
+  view.querySelector('.chapter-body').style.fontSize = fontSize + 'px';
+
+  // Re-apply highlights for this chapter
+  applyHighlightsToDOM();
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Close sidebar on mobile
+  if (window.innerWidth <= 768) {
+    closeSidebar();
+  }
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// START BUTTON
+document.getElementById('start-btn').addEventListener('click', () => {
+  loadChapter('intro');
+});
+
+// SIDEBAR TOGGLE
+const menuBtn = document.getElementById('menu-btn');
+const sidebar = document.getElementById('sidebar');
+const main = document.getElementById('main');
+
+menuBtn.addEventListener('click', () => {
+  sidebarOpen = !sidebarOpen;
+  if (sidebarOpen) openSidebar(); else closeSidebar();
+});
+
+function openSidebar() {
+  sidebar.classList.remove('collapsed');
+  main.classList.remove('expanded');
+  menuBtn.classList.add('open');
+  sidebarOpen = true;
+}
+function closeSidebar() {
+  sidebar.classList.add('collapsed');
+  main.classList.add('expanded');
+  menuBtn.classList.remove('open');
+  sidebarOpen = false;
+}
+
+// THEME TOGGLE
+document.getElementById('theme-btn').addEventListener('click', () => {
+  isDark = !isDark;
+  if (isDark) {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.getElementById('theme-icon-light').style.display = 'none';
+    document.getElementById('theme-icon-dark').style.display = 'block';
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    document.getElementById('theme-icon-light').style.display = 'block';
+    document.getElementById('theme-icon-dark').style.display = 'none';
+  }
+  localStorage.setItem('tfas_dark', isDark);
+});
+
+if (isDark) {
+  document.getElementById('theme-icon-light').style.display = 'none';
+  document.getElementById('theme-icon-dark').style.display = 'block';
+}
+
+// FONT SIZE
+document.getElementById('font-inc').addEventListener('click', () => {
+  fontSize = Math.min(24, fontSize + 1);
+  applyFontSize();
+  localStorage.setItem('tfas_fontsize', fontSize);
+});
+document.getElementById('font-dec').addEventListener('click', () => {
+  fontSize = Math.max(14, fontSize - 1);
+  applyFontSize();
+  localStorage.setItem('tfas_fontsize', fontSize);
+});
+function applyFontSize() {
+  const body = document.getElementById('chapter-body');
+  if (body) body.style.fontSize = fontSize + 'px';
+}
+
+// READING PROGRESS
+window.addEventListener('scroll', () => {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+  document.getElementById('reading-progress-fill').style.width = pct + '%';
+});
+
+// SEARCH
+const searchInput = document.getElementById('search-input');
+searchInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    const q = searchInput.value.trim().toLowerCase();
+    if (!q) return;
+
+    // Find first chapter containing this term
+    const found = BOOK_DATA.find(ch => !ch.is_part && ch.text && ch.text.toLowerCase().includes(q));
+    if (found) {
+      loadChapter(found.id);
+      setTimeout(() => {
+        const body = document.getElementById('chapter-body');
+        if (!body) return;
+        body.innerHTML = body.innerHTML.replace(
+          new RegExp(escapeRegex(q), 'gi'),
+          m => `<mark class="search-highlight">${m}</mark>`
+        );
+        const first = body.querySelector('.search-highlight');
+        if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    }
+  }
+});
+
+function escapeRegex(s) {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+// HIGHLIGHTS PANEL
+const hBtn = document.getElementById('highlights-btn');
+const hPanel = document.getElementById('highlights-panel');
+
+hBtn.addEventListener('click', () => {
+  highlightsPanelOpen = !highlightsPanelOpen;
+  hPanel.classList.toggle('open', highlightsPanelOpen);
+  renderHighlightsPanel();
+});
+
+function renderHighlightsPanel() {
+  const list = document.getElementById('hp-list');
+  const count = document.getElementById('hp-count');
+  count.textContent = highlights.length;
+
+  if (highlights.length === 0) {
+    list.innerHTML = `<div id="hp-empty">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="display:block;margin:0 auto 12px"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      <p>Select any text while reading to highlight it. Your highlights appear here.</p>
+    </div>`;
+    return;
+  }
+
+  list.innerHTML = highlights.map((h, i) => `
+    <div class="highlight-card" data-idx="${i}">
+      <div class="hc-chapter">${escapeHtml(h.chapterTitle)}</div>
+      <button class="hc-delete" data-idx="${i}" title="Delete">×</button>
+      <div class="hc-text">${escapeHtml(h.text.substring(0, 180))}${h.text.length > 180 ? '…' : ''}</div>
+      ${h.note ? `<div class="hc-note">${escapeHtml(h.note)}</div>` : ''}
+    </div>
+  `).join('');
+
+  list.querySelectorAll('.highlight-card').forEach(card => {
+    card.addEventListener('click', e => {
+      if (e.target.classList.contains('hc-delete')) {
+        const idx = parseInt(e.target.dataset.idx);
+        highlights.splice(idx, 1);
+        saveHighlights();
+        renderHighlightsPanel();
+        return;
+      }
+      const idx = parseInt(card.dataset.idx);
+      const h = highlights[idx];
+      if (h && h.chapterId) loadChapter(h.chapterId);
+    });
+  });
+}
+
+// HIGHLIGHT TOOLBAR
+const toolbar = document.getElementById('highlight-toolbar');
+let selectionRange = null;
+let selectionText = '';
+
+document.addEventListener('mouseup', (e) => {
+  if (toolbar.contains(e.target)) return;
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+    setTimeout(() => {
+      if (!toolbar.contains(document.activeElement)) hideToolbar();
+    }, 100);
+    return;
+  }
+
+  const chapterBody = document.getElementById('chapter-body');
+  if (!chapterBody) return;
+
+  const range = sel.getRangeAt(0);
+  if (!chapterBody.contains(range.commonAncestorContainer)) return;
+
+  selectionText = sel.toString().trim();
+  selectionRange = range.cloneRange();
+
+  const rect = range.getBoundingClientRect();
+  toolbar.style.left = (rect.left + rect.width / 2 + window.scrollX) + 'px';
+  toolbar.style.top = (rect.top + window.scrollY) + 'px';
+  toolbar.classList.add('visible');
+});
+
+document.addEventListener('mousedown', (e) => {
+  if (!toolbar.contains(e.target)) hideToolbar();
+});
+
+function hideToolbar() {
+  toolbar.classList.remove('visible');
+}
+
+// HIGHLIGHT action
+document.getElementById('ht-highlight').addEventListener('click', () => {
+  if (!selectionText || !currentChapterId) return;
+  addHighlight(selectionText, null);
+  hideToolbar();
+  window.getSelection().removeAllRanges();
+});
+
+// NOTE action
+document.getElementById('ht-note').addEventListener('click', () => {
+  pendingHighlight = { text: selectionText, chapterId: currentChapterId };
+  document.getElementById('note-modal').classList.add('open');
+  document.getElementById('note-textarea').value = '';
+  document.getElementById('note-textarea').focus();
+  hideToolbar();
+});
+
+document.getElementById('note-cancel').addEventListener('click', () => {
+  document.getElementById('note-modal').classList.remove('open');
+  pendingHighlight = null;
+});
+
+document.getElementById('note-save').addEventListener('click', () => {
+  if (pendingHighlight) {
+    const note = document.getElementById('note-textarea').value.trim();
+    addHighlight(pendingHighlight.text, note);
+    pendingHighlight = null;
+  }
+  document.getElementById('note-modal').classList.remove('open');
+});
+
+// COPY
+document.getElementById('ht-copy').addEventListener('click', () => {
+  if (selectionText) {
+    navigator.clipboard.writeText(selectionText).catch(() => {});
+  }
+  hideToolbar();
+});
+
+function addHighlight(text, note) {
+  const ch = BOOK_DATA.find(c => c.id === currentChapterId);
+  highlights.push({
+    id: Date.now(),
+    text,
+    note,
+    chapterId: currentChapterId,
+    chapterTitle: ch ? ch.title : '',
+    timestamp: new Date().toISOString()
+  });
+  saveHighlights();
+  applyHighlightsToDOM();
+  document.getElementById('hp-count').textContent = highlights.length;
+
+  // Flash feedback
+  const flash = document.createElement('div');
+  flash.style.cssText = `position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:980px;font-size:14px;font-weight:600;z-index:9999;transition:opacity 0.5s;font-family:var(--sans)`;
+  flash.textContent = note ? '✓ Highlight & note saved' : '✓ Highlight saved';
+  document.body.appendChild(flash);
+  setTimeout(() => { flash.style.opacity = '0'; setTimeout(() => flash.remove(), 500); }, 1800);
+}
+
+function saveHighlights() {
+  localStorage.setItem('tfas_highlights', JSON.stringify(highlights));
+}
+
+function applyHighlightsToDOM() {
+  const body = document.getElementById('chapter-body');
+  if (!body || !currentChapterId) return;
+
+  const chHighlights = highlights.filter(h => h.chapterId === currentChapterId);
+  if (chHighlights.length === 0) return;
+
+  let html = body.innerHTML;
+  chHighlights.forEach(h => {
+    const escaped = escapeRegex(escapeHtml(h.text.substring(0, 100)));
+    try {
+      html = html.replace(new RegExp(escaped, 'g'), m => `<mark>${m}</mark>`);
+    } catch(e) {}
+  });
+  body.innerHTML = html;
+}
+
+// Close highlights panel on outside click
+document.addEventListener('click', (e) => {
+  if (highlightsPanelOpen && !hPanel.contains(e.target) && !hBtn.contains(e.target)) {
+    highlightsPanelOpen = false;
+    hPanel.classList.remove('open');
+  }
+});
+
+// Mobile sidebar close on content click
+main.addEventListener('click', () => {
+  if (window.innerWidth <= 768 && sidebarOpen) {
+    closeSidebar();
+  }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'Escape') {
+    document.getElementById('note-modal').classList.remove('open');
+    highlightsPanelOpen = false;
+    hPanel.classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
