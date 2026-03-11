@@ -47,7 +47,6 @@
     overflow-x: hidden;
   }
 
-  /* HEADER */
   #header {
     position: fixed;
     top: 0; left: 0; right: 0;
@@ -148,14 +147,12 @@
   }
   #search-input::placeholder { color: var(--text3); }
 
-  /* LAYOUT */
   #layout {
     display: flex;
     min-height: 100vh;
     padding-top: var(--header-h);
   }
 
-  /* SIDEBAR */
   #sidebar {
     width: var(--sidebar-w);
     position: fixed;
@@ -224,7 +221,6 @@
     color: white !important;
   }
 
-  /* MAIN CONTENT */
   #main {
     flex: 1;
     margin-left: var(--sidebar-w);
@@ -294,8 +290,7 @@
     font-weight: 700;
     color: var(--accent);
   }
-
-  /* HIGHLIGHT */
+  
   mark {
     background: var(--highlight-bg);
     color: inherit;
@@ -341,7 +336,6 @@
 
   .ht-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.2); margin: 0 2px; }
 
-  /* HIGHLIGHTS PANEL */
   #highlights-panel {
     position: fixed;
     top: var(--header-h);
@@ -417,7 +411,6 @@
   }
   .hc-delete:hover { color: #ff3b30; }
 
-  /* WELCOME SCREEN */
   #welcome {
     display: flex;
     flex-direction: column;
@@ -491,7 +484,6 @@
   #start-btn:hover { background: var(--accent-hover); transform: scale(1.02); }
   #start-btn:active { transform: scale(0.98); }
 
-  /* PROGRESS BAR */
   #reading-progress {
     position: fixed;
     top: var(--header-h);
@@ -508,15 +500,12 @@
     transition: width 0.1s;
   }
 
-  /* SCROLLBAR */
   #sidebar::-webkit-scrollbar, #highlights-panel::-webkit-scrollbar { width: 4px; }
   #sidebar::-webkit-scrollbar-track, #highlights-panel::-webkit-scrollbar-track { background: transparent; }
   #sidebar::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 2px; }
 
-  /* SEARCH RESULTS */
   .search-highlight { background: rgba(255, 180, 0, 0.4); border-radius: 2px; }
 
-  /* EMPTY HIGHLIGHTS */
   #hp-empty {
     text-align: center;
     padding: 60px 24px;
@@ -525,14 +514,12 @@
   #hp-empty svg { margin-bottom: 16px; opacity: 0.4; }
   #hp-empty p { font-size: 14px; line-height: 1.5; }
 
-  /* FONT SIZE CONTROL */
   #font-controls {
     display: flex;
     align-items: center;
     gap: 8px;
   }
 
-  /* Note modal */
   #note-modal {
     display: none;
     position: fixed;
@@ -595,7 +582,6 @@
 </style>
 </head>
 <body>
-<!-- HEADER -->
 <header id="header">
   <div id="header-left">
     <button id="menu-btn" aria-label="Toggle sidebar">
@@ -620,20 +606,15 @@
   </div>
 </header>
 
-<!-- READING PROGRESS -->
 <div id="reading-progress"><div id="reading-progress-fill"></div></div>
 
-<!-- LAYOUT -->
 <div id="layout">
-  <!-- SIDEBAR -->
   <nav id="sidebar">
     <div id="sidebar-header">Contents</div>
     <div id="nav-list"></div>
   </nav>
 
-  <!-- MAIN -->
   <main id="main">
-    <!-- WELCOME -->
     <div id="welcome">
       <div id="welcome-book">Thinking,<br>Fast and Slow<br><br>Daniel<br>Kahneman</div>
       <h1>Thinking,<br>Fast and Slow</h1>
@@ -641,12 +622,10 @@
       <button id="start-btn">Start Reading</button>
     </div>
 
-    <!-- CHAPTER VIEW (hidden initially) -->
     <div id="chapter-view" style="display:none"></div>
   </main>
 </div>
 
-<!-- HIGHLIGHT TOOLBAR -->
 <div id="highlight-toolbar">
   <button class="ht-btn" id="ht-highlight">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
@@ -664,7 +643,6 @@
   </button>
 </div>
 
-<!-- HIGHLIGHTS PANEL -->
 <div id="highlights-panel">
   <div id="hp-header">
     <span id="hp-title">Highlights</span>
@@ -678,7 +656,6 @@
   </div>
 </div>
 
-<!-- NOTE MODAL -->
 <div id="note-modal">
   <div id="note-box">
     <h3>Add a note</h3>
@@ -692,7 +669,6 @@
 
 <script src="book_data.js"></script>
 <script>
-// STATE
 let currentChapterId = null;
 let highlights = JSON.parse(localStorage.getItem('tfas_highlights') || '[]');
 let fontSize = parseInt(localStorage.getItem('tfas_fontsize') || '18');
@@ -701,10 +677,8 @@ let sidebarOpen = true;
 let highlightsPanelOpen = false;
 let isDark = localStorage.getItem('tfas_dark') === 'true';
 
-// INIT THEME
 if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
 
-// BUILD NAV
 const navList = document.getElementById('nav-list');
 let currentPart = null;
 
@@ -725,7 +699,6 @@ BOOK_DATA.forEach(ch => {
   }
 });
 
-// LOAD CHAPTER
 function loadChapter(id) {
   const ch = BOOK_DATA.find(c => c.id === id);
   if (!ch) return;
@@ -735,12 +708,10 @@ function loadChapter(id) {
   const view = document.getElementById('chapter-view');
   view.style.display = 'block';
 
-  // Update active nav
   document.querySelectorAll('.nav-item').forEach(b => {
     b.classList.toggle('active', b.dataset.id === id);
   });
 
-  // Format text into paragraphs
   const rawText = ch.text || '';
   const paragraphs = rawText
     .replace(/\r\n/g, '\n')
@@ -758,16 +729,12 @@ function loadChapter(id) {
     <div class="chapter-body" id="chapter-body">${bodyHtml}</div>
   `;
 
-  // Apply font size
   view.querySelector('.chapter-body').style.fontSize = fontSize + 'px';
 
-  // Re-apply highlights for this chapter
   applyHighlightsToDOM();
 
-  // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // Close sidebar on mobile
   if (window.innerWidth <= 768) {
     closeSidebar();
   }
@@ -777,12 +744,10 @@ function escapeHtml(s) {
   return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// START BUTTON
 document.getElementById('start-btn').addEventListener('click', () => {
   loadChapter('intro');
 });
 
-// SIDEBAR TOGGLE
 const menuBtn = document.getElementById('menu-btn');
 const sidebar = document.getElementById('sidebar');
 const main = document.getElementById('main');
@@ -805,7 +770,6 @@ function closeSidebar() {
   sidebarOpen = false;
 }
 
-// THEME TOGGLE
 document.getElementById('theme-btn').addEventListener('click', () => {
   isDark = !isDark;
   if (isDark) {
@@ -825,7 +789,6 @@ if (isDark) {
   document.getElementById('theme-icon-dark').style.display = 'block';
 }
 
-// FONT SIZE
 document.getElementById('font-inc').addEventListener('click', () => {
   fontSize = Math.min(24, fontSize + 1);
   applyFontSize();
@@ -841,7 +804,6 @@ function applyFontSize() {
   if (body) body.style.fontSize = fontSize + 'px';
 }
 
-// READING PROGRESS
 window.addEventListener('scroll', () => {
   const scrollTop = window.scrollY;
   const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -849,14 +811,12 @@ window.addEventListener('scroll', () => {
   document.getElementById('reading-progress-fill').style.width = pct + '%';
 });
 
-// SEARCH
 const searchInput = document.getElementById('search-input');
 searchInput.addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     const q = searchInput.value.trim().toLowerCase();
     if (!q) return;
 
-    // Find first chapter containing this term
     const found = BOOK_DATA.find(ch => !ch.is_part && ch.text && ch.text.toLowerCase().includes(q));
     if (found) {
       loadChapter(found.id);
@@ -878,7 +838,6 @@ function escapeRegex(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-// HIGHLIGHTS PANEL
 const hBtn = document.getElementById('highlights-btn');
 const hPanel = document.getElementById('highlights-panel');
 
@@ -926,7 +885,6 @@ function renderHighlightsPanel() {
   });
 }
 
-// HIGHLIGHT TOOLBAR
 const toolbar = document.getElementById('highlight-toolbar');
 let selectionRange = null;
 let selectionText = '';
@@ -964,7 +922,6 @@ function hideToolbar() {
   toolbar.classList.remove('visible');
 }
 
-// HIGHLIGHT action
 document.getElementById('ht-highlight').addEventListener('click', () => {
   if (!selectionText || !currentChapterId) return;
   addHighlight(selectionText, null);
@@ -972,7 +929,6 @@ document.getElementById('ht-highlight').addEventListener('click', () => {
   window.getSelection().removeAllRanges();
 });
 
-// NOTE action
 document.getElementById('ht-note').addEventListener('click', () => {
   pendingHighlight = { text: selectionText, chapterId: currentChapterId };
   document.getElementById('note-modal').classList.add('open');
@@ -995,7 +951,6 @@ document.getElementById('note-save').addEventListener('click', () => {
   document.getElementById('note-modal').classList.remove('open');
 });
 
-// COPY
 document.getElementById('ht-copy').addEventListener('click', () => {
   if (selectionText) {
     navigator.clipboard.writeText(selectionText).catch(() => {});
@@ -1017,7 +972,6 @@ function addHighlight(text, note) {
   applyHighlightsToDOM();
   document.getElementById('hp-count').textContent = highlights.length;
 
-  // Flash feedback
   const flash = document.createElement('div');
   flash.style.cssText = `position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:980px;font-size:14px;font-weight:600;z-index:9999;transition:opacity 0.5s;font-family:var(--sans)`;
   flash.textContent = note ? '✓ Highlight & note saved' : '✓ Highlight saved';
@@ -1046,7 +1000,6 @@ function applyHighlightsToDOM() {
   body.innerHTML = html;
 }
 
-// Close highlights panel on outside click
 document.addEventListener('click', (e) => {
   if (highlightsPanelOpen && !hPanel.contains(e.target) && !hBtn.contains(e.target)) {
     highlightsPanelOpen = false;
@@ -1054,14 +1007,12 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Mobile sidebar close on content click
 main.addEventListener('click', () => {
   if (window.innerWidth <= 768 && sidebarOpen) {
     closeSidebar();
   }
 });
 
-// Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   if (e.key === 'Escape') {
